@@ -10,7 +10,7 @@ This is REST based API to list, add, update and delete books. As it for beginner
 ## ▶️ How to Run the Project
 Clone the repository, move into the project directory, build the project, and run the application using the commands below:
 
-### Step 1: Clone the repository
+### Usage
 ```bash
 git clone https://github.com/Sarvagya035/Golang_projects.git
 cd Bookstore_API
