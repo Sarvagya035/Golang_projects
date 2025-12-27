@@ -21,13 +21,11 @@ git clone https://github.com/Sarvagya035/Golang_projects.git
 
 cd Password_Generator_CLI
 
-/*
-    A sample input is shown below.
-    please make sure that sum of lower character, upper character, special character and numeric character must be less than or equal to length of password
-*/
+# A sample input is shown below.
+# please make sure that sum of lower character, upper character, special character and numeric character must be less than or equal to length of password
 
 go run main.go generate --length 12 --minlower 4 --minupper 5 --minspecial 1 --minnumber 2
 
-// Another example includes usage of default values if flags are not provides
+# Another example includes usage of default values if flags are not provides
 
 go run main.go generate --length 16
