@@ -1,7 +1,9 @@
 package main
 
 import (
+	"archive/zip"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 )
@@ -21,6 +23,7 @@ const (
 	parent_file_name    = "parent.txt"
 	parent_file_content = "Hello this is the parent folder of the program"
 	child_file_content  = "Hello this is the content of child folder"
+	zip_folder_name     = "parent.zip"
 )
 
 func createFolder(targetpath string, foldername string) {
@@ -61,6 +64,57 @@ func createFile(targetpath string, filename string, filedata string) {
 	}
 }
 
+func createZipFolder(sourceDir string, zipfilename string) {
+
+	zipFile, err := os.Create(zipfilename)
+
+	checkerr(err)
+
+	defer zipFile.Close()
+
+	zipwriter := zip.NewWriter(zipFile)
+
+	defer zipwriter.Close()
+
+	err = filepath.Walk(sourceDir, func(path string, info os.FileInfo, err error) error {
+
+		if err != nil {
+			return err
+		}
+		header, err := zip.FileInfoHeader(info)
+		if err != nil {
+			return err
+		}
+
+		relpath, err := filepath.Rel(sourceDir, path)
+		if err != nil {
+			return err
+		}
+		header.Name = filepath.ToSlash(relpath)
+
+		if info.IsDir() {
+			header.Name += "/"
+		} else {
+			header.Method = zip.Deflate
+		}
+
+		writer, err := zipwriter.CreateHeader(header)
+
+		if !info.IsDir() {
+			file, err := os.Open(path)
+			checkerr(err)
+			file.Close()
+
+			_, err = io.Copy(writer, file)
+			checkerr(err)
+		}
+
+		return nil
+	})
+
+	checkerr(err)
+}
+
 func main() {
 
 	fmt.Println("Welcome to file-folder-zip program")
@@ -80,4 +134,6 @@ func main() {
 	child_path := filepath.Join(parent_path, child_folder_name)
 
 	createFile(child_path, child_file_name, child_file_content)
+
+	createZipFolder(parent_path, zip_folder_name)
 }
