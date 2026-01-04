@@ -35,7 +35,5 @@ git clone https://github.com/Sarvagya035/Golang_projects.git
 
 cd file-folder-zip
 
-# A sample input is shown below.
-
 go run main.go
 
