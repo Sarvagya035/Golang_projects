@@ -3,9 +3,11 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"log"
 	"os"
 
+	"github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -30,7 +32,7 @@ var (
 
 func main() {
 
-	fmt.Println("....Golanf=g-ssh-demo....")
+	fmt.Println("....Golang-ssh-demo....")
 
 	conf := sshDemoWithPrivateKey()
 
@@ -38,6 +40,7 @@ func main() {
 
 	sshClient, err := ssh.Dial("tcp", sshHostName, conf)
 	checkerr(err)
+	defer sshClient.Close()
 
 	session, err := sshClient.NewSession()
 	checkerr(err)
@@ -54,6 +57,55 @@ func main() {
 	checkerr(err)
 
 	log.Printf("%s: %s", commandToExec, b.String())
+
+	//open sftp connection
+
+	sftpClient, err := sftp.NewClient(sshClient)
+
+	checkerr(err)
+	defer sftpClient.Close()
+
+	//create a file
+
+	createFile, err := sftpClient.Create(fileToDownload)
+	checkerr(err)
+	text := "This file is created by Golang ssh,\nThis will be downloaded by Golang SSH\n"
+	_, err = createFile.Write([]byte(text))
+	checkerr(err)
+	fmt.Println("Created File", fileToDownload)
+
+	//upload a file
+
+	srcfile, err := os.Open(fileToUpload)
+	checkerr(err)
+	defer srcfile.Close()
+
+	dstfile, err := sftpClient.Create(fileUploadLocation)
+	checkerr(err)
+
+	defer dstfile.Close()
+
+	_, err = io.Copy(dstfile, srcfile)
+	checkerr(err)
+	fmt.Println("File Uploaded Sucessfully", fileUploadLocation)
+
+	//Download a file
+
+	remotefile, err := sftpClient.Open(fileToDownload)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to open remote file: %v\n", err)
+		return
+	}
+
+	defer remotefile.Close()
+
+	localfile, err := os.Create("./download.txt")
+	checkerr(err)
+	defer localfile.Close()
+
+	_, err = io.Copy(localfile, remotefile)
+	checkerr(err)
+	fmt.Println("File Downloaded Sucessfully")
 
 }
 
