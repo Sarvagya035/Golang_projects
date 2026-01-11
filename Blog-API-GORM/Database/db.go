@@ -12,7 +12,7 @@ var DB *gorm.DB
 
 func Connect() {
 
-	dsn := "root:Learningisfun@2026@tcp(127.0.0.1:3306)/Blog_API?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := "PASTE_YOUR_SECRET_KEY_HERE"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
 	if err != nil {
