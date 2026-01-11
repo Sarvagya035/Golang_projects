@@ -1,13 +1,12 @@
 package main
 
 import (
-	database "blogAPI_GORM/Database"
-	routers "blogAPI_GORM/Routers"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 
+	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
 
@@ -30,13 +29,15 @@ func main() {
 
 	PORT := ":" + os.Getenv("PORT")
 
-	//connecting to database
+	r := gin.Default()
 
-	database.Connect()
+	r.GET("/ping", func(c *gin.Context) {
+		//Return JSON response
+		c.JSON(http.StatusOK, gin.H{
+			"message": "pong",
+		})
+	})
 
-	//Routers and stuff
+	log.Fatal(r.Run(PORT))
 
-	router := routers.Router()
-
-	log.Fatal(http.ListenAndServe(PORT, router))
 }
